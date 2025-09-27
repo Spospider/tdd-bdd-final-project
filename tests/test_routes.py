@@ -28,11 +28,11 @@ import os
 import logging
 from decimal import Decimal
 from unittest import TestCase
+from urllib.parse import quote_plus
 from service import app
 from service.common import status
 from service.models import db, init_db, Product
 from tests.factories import ProductFactory
-from urllib.parse import quote_plus
 
 # Disable all but critical errors during normal test run
 # uncomment for debugging failing tests
@@ -205,12 +205,12 @@ class TestProductRoutes(TestCase):
         """It should Delete a Product"""
         products = self._create_products(5)
         product_count = self.get_product_count()
-        p = products[0]
-        response = self.client.delete(f"{BASE_URL}/{p.id}")
+        prod = products[0]
+        response = self.client.delete(f"{BASE_URL}/{prod.id}")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(response.data), 0)
 
-        response = self.client.get(f"{BASE_URL}/{p.id}")
+        response = self.client.get(f"{BASE_URL}/{prod.id}")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         new_count = self.get_product_count()
         self.assertEqual(new_count, product_count - 1)

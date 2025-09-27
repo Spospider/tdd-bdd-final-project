@@ -163,8 +163,8 @@ class TestProductModel(unittest.TestCase):
     def test_find_by_availability(self):
         """It should Find Products by Availability"""
         products = ProductFactory.create_batch(10)
-        for p in products:
-            p.create()
+        for prod in products:
+            prod.create()
         availability = products[0].available
         count = len([product for product in products if product.available == availability])
         found = Product.find_by_availability(availability)
@@ -187,11 +187,11 @@ class TestProductModel(unittest.TestCase):
     def test_find_by_price(self):
         """It should find my price"""
         products = ProductFactory.create_batch(10)
-        p = products[0]
-        p.price = 1.0
+        prod = products[0]
+        prod.price = 1.0
         for product in products:
             product.create()
         filter_set = [prod.id for prod in products if prod.price == 1.0]
 
         found_set = Product.find_by_price(1.0)
-        self.assertEqual(all(p.id in filter_set for p in found_set), True)
+        self.assertEqual(all(prod.id in filter_set for prod in found_set), True)
