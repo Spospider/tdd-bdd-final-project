@@ -91,6 +91,8 @@ class Product(db.Model):
         """
         Creates a Product to the database
         """
+        if isinstance(self.category, str):
+            self.category = Category[self.category]
         logger.info("Creating %s", self.name)
         # id must be none to generate next primary key
         self.id = None  # pylint: disable=invalid-name
@@ -101,6 +103,9 @@ class Product(db.Model):
         """
         Updates a Product to the database
         """
+        if isinstance(self.category, str):
+            self.category = Category[self.category]
+
         logger.info("Saving %s", self.name)
         if not self.id:
             raise DataValidationError("Update called with empty ID field")
@@ -114,13 +119,16 @@ class Product(db.Model):
 
     def serialize(self) -> dict:
         """Serializes a Product into a dictionary"""
+        if isinstance(self.category, str):
+            self.category = Category[self.category]
+
         return {
             "id": self.id,
             "name": self.name,
             "description": self.description,
             "price": str(self.price),
             "available": self.available,
-            "category": self.category.name  # convert enum to string
+            "category": self.category.name   # convert enum to string
         }
 
     def deserialize(self, data: dict):
