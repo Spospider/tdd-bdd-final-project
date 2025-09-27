@@ -103,9 +103,6 @@ class Product(db.Model):
         """
         Updates a Product to the database
         """
-        if isinstance(self.category, str):
-            self.category = Category[self.category]
-
         logger.info("Saving %s", self.name)
         if not self.id:
             raise DataValidationError("Update called with empty ID field")

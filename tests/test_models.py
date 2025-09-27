@@ -27,7 +27,7 @@ import os
 import logging
 import unittest
 from decimal import Decimal
-from service.models import Product, Category, db
+from service.models import Product, Category, db, DataValidationError
 from service import app
 from tests.factories import ProductFactory
 
@@ -116,6 +116,19 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(found_product.description, product.description)
         self.assertEqual(found_product.price, product.price)
 
+    def test_update_a_product(self):
+        """It should Update a Product"""
+        product = ProductFactory()
+        product.create()
+        self.assertEqual(len(Product.all()), 1)
+        product.name = "ABC"
+        product.update()
+        found_product = Product.find(product.id)
+        self.assertEqual(found_product.name, product.name)
+        product.id = None
+        with self.assertRaises(DataValidationError):
+            product.update()
+
     def test_delete_a_product(self):
         """It should Delete a Product"""
         product = ProductFactory()
@@ -143,10 +156,9 @@ class TestProductModel(unittest.TestCase):
         for product in products:
             product.create()
         name = products[0].name
-        count = len([product for product in products if product.name == name])
         found = Product.find_by_name(name)
         for product in found:
-            self.assertEqual(product.name, name)        
+            self.assertEqual(product.name, name)
 
     def test_find_by_availability(self):
         """It should Find Products by Availability"""
@@ -171,3 +183,15 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(found.count(), count)
         for product in found:
             self.assertEqual(product.category, category)
+
+    def test_find_by_price(self):
+        """It should find my price"""
+        products = ProductFactory.create_batch(10)
+        p = products[0]
+        p.price = 1.0
+        for product in products:
+            product.create()
+        filter_set = [prod.id for prod in products if prod.price == 1.0]
+
+        found_set = Product.find_by_price(1.0)
+        self.assertEqual(all(p.id in filter_set for p in found_set), True)
